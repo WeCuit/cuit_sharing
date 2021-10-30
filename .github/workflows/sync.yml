@@ -36,4 +36,4 @@ jobs:
           upstream_sync_repo: andream7/cuit_sharing
           
           # Set test_mode true to run tests instead of the true action!!
-          test_mode: true
+          test_mode: false
