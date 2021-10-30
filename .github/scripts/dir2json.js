@@ -25,6 +25,7 @@ function getIndexOfPathByDeep(obj, dir, curDir, ignoreName, deep) {
             lists.forEach(name => getIndexOfPathByDeep(curEle.list, curPath, name, ignoreName, deep - 1))
         }else{
             // 文件
+            curEle.size = fs.statSync(curPath).size
             curEle.type = "file"
         }
     }
