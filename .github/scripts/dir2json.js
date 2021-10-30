@@ -30,7 +30,8 @@ function getIndexOfPathByDeep(obj, dir, curDir, ignoreName, deep) {
     }
  
 }
-let index = getIndexByPath("./../../", [".git", ".github"], 5)
+
+let index = getIndexByPath("./../../", [".git", ".github", ".gitignore", "dist", "LICENSE", "README.md"], 5)
 let file = path.resolve(__dirname, './../../dist/result.json')
-fs.writeFileSync(file, JSON.stringify(index))
+fs.writeFileSync(file, JSON.stringify(index[0].list))
 console.log(JSON.stringify(index))
