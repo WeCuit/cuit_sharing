@@ -9,6 +9,8 @@ on:
     branches: [ sync ]
   pull_request:
     branches: [ sync ]
+  schedule:
+    - cron: '0 */2 * * *' # every 2 hours
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -28,6 +30,10 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+        with:
+          # optional: set the branch to checkout,
+          # sync action checks out your 'target_sync_branch' anyway
+          ref:  main
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2

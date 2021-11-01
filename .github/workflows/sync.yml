@@ -9,7 +9,6 @@ on:
   
 jobs:
   sync:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
