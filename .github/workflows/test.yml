@@ -13,7 +13,7 @@ jobs:
           user-name: jiyeme
           user-email: jiyecafe@gmail.com
           from-branch: main
-          to-branch: main
+          to-branch: test
           access-token: ${{ secrets.GITHUB_TOKEN }}
       - run: echo "$test" && echo "$steps.sync.outputs.has_new_commits"
         env:
