@@ -1,0 +1,20 @@
+name: Fork News
+on:
+  push:
+    branches: [test]
+jobs:
+  fork-news:
+    runs-on: ubuntu-latest
+    name: Sync with parent repository
+    steps:
+      - id: sync
+        uses: jiyeme/fork-news@v1.0.1
+        with:
+          user-name: jiyeme
+          user-email: jiyecafe@gmail.com
+          from-branch: main
+          to-branch: main
+          access-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: echo "$test" && echo "$steps.sync.outputs.has_new_commits"
+        env:
+          test: ${{ toJSON(steps.sync.outputs) }}
