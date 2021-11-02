@@ -14,42 +14,39 @@ jobs:
       matrix:
         node-version: [14.x]
     steps:
-      # REQUIRED step
-      # Step 1: run a standard checkout action, provided by github
-      - name: Checkout target repo
-        uses: actions/checkout@v2
+      - id: sync
+        uses: jiyeme/fork-news@v1.0.1
         with:
-          # optional: set the branch to checkout,
-          # sync action checks out your 'target_sync_branch' anyway
-          ref:  main
-          # REQUIRED if your upstream repo is private (see wiki)
-          persist-credentials: false
-
-      # REQUIRED step
-      # Step 2: run the sync action
-      - name: Sync upstream changes
-        id: sync
-        uses: aormsby/Fork-Sync-With-Upstream-action@v3.0
-        with:
-          target_sync_branch: main
-          # REQUIRED 'target_repo_token' exactly like this!
-          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
-          upstream_sync_branch: main
-          upstream_sync_repo: andream7/cuit_sharing
-          # Set test_mode true to run tests instead of the true action!!
-          test_mode: false
-          git_config_user: 'jiyeme'
-          git_config_email: 'jiyecafe@gmail.com'
+          user-name: ${{ github.actor }}
+          user-email: jiyecafe@gmail.com
+          from-branch: main
+          to-branch: main
+          access-token: ${{ secrets.GITHUB_TOKEN }}
 
       # ############# API ###############
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        if: steps.sync.outputs.has_new_commits == 'true'
+        with:
+          fetch-depth: 0
+
+      - name: Copy Script
+        if: steps.sync.outputs.has_new_commits == 'true'
+        run: |
+          git checkout sync
+          mkdir -p dist/scripts
+          cp ./.github/scripts/dir2json.js ./dist/scripts/dir2json.js
+          git checkout main
+
       - name: Use Node.js ${{ matrix.node-version }}
         if: steps.sync.outputs.has_new_commits == 'true'
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
 
-      - if: steps.sync.outputs.has_new_commits == 'true'
-        run: mkdir dist && node ./.github/scripts/dir2json.js
+      - name: Generate Tree Of Files
+        if: steps.sync.outputs.has_new_commits == 'true'
+        run: node ./dist/scripts/dir2json.js
 
       - name: Deploy to GitHub Pages
         if: steps.sync.outputs.has_new_commits == 'true'
@@ -59,7 +56,3 @@ jobs:
           build_dir: dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: No new commits
-        if: steps.sync.outputs.has_new_commits == 'false'
-        run: echo "There were no new commits."

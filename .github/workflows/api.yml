@@ -31,16 +31,21 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         with:
-          # optional: set the branch to checkout,
-          # sync action checks out your 'target_sync_branch' anyway
-          ref:  main
+          fetch-depth: 0
+
+      - name: Copy Script
+        run: |
+          mkdir -p dist/scripts
+          cp ./.github/scripts/dir2json.js ./dist/scripts/dir2json.js
+          git checkout main
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
 
-      - run: mkdir dist && node ./.github/scripts/dir2json.js
+      - name: Generate Tree Of Files
+        run: node ./dist/scripts/dir2json.js
 
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v2
