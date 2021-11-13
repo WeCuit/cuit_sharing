@@ -1,0 +1,44 @@
+name: Update JSON
+
+on:
+  push:
+    branches: [add]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+      # ############# API ###############
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Copy Script
+        run: |
+          git checkout sync
+          mkdir -p dist/scripts
+          cp ./.github/scripts/dir2json.js ./dist/scripts/dir2json.js
+          git checkout main
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Generate Tree Of Files
+        run: node ./dist/scripts/dir2json.js
+
+      - name: Deploy to GitHub Pages
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: api
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
